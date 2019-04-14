@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hello World!</title>
+  <style>
+    #header {
+      background-color: black;
+      color: white;
+      text-align: center;
+      padding: 5px;
+    }
+
+    #nav {
+      line-height: 30px;
+      background-color: #eeeeee;
+      height: 300px;
+      width: 100px;
+      float: left;
+      padding: 5px;
+    }
+
+    #section {
+      width: 350px;
+      float: left;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="header">
+    <h1>City Gallery</h1>
+  </div>
+
+  <div id="nav">
+    London<br>
+    Paris<br>
+    Tokyo<br>
+  </div>
+
+  <div id="section">
+    <form id="myForm">
+      <div>
+        <input type="file" name="filedir" id="fd">
+        <p id="dir"></p>
+      </div>
+      <div>
+        <label>SginType: </label>
+        <label>
+          <input type="radio" name="sign" value="v1">v1
+        </label>
+        <label>
+          <input type="radio" name="sign" value="v2">v2
+        </label>
+      </div>
+    </form>
+    <div>
+      <button name="test" id="test">Click</button>
+    </div>
+  </div>
+
+
+  <script>
+    // You can also require other files to run in this process
+    require('./renderer.js')
+
+    document.getElementById("fd").addEventListener("change", function () {
+      var myForm = document.getElementById('myForm');
+      var formData = new FormData(myForm);
+
+      console.log(formData.get("filedir").path);
+      var dir = document.getElementById("dir");
+      if (dir.firstChild == null) {
+        var textNode = document.createTextNode(formData.get("filedir").path);
+        dir.appendChild(textNode);
+      } else {
+        dir.firstChild.data = formData.get("filedir").path;
+      }
+    });
+
+    const { exec } = require('child_process');
+
+    document.getElementById("test").addEventListener("click", function () {
+      exec('cd', (err, stdout, stderr) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+      })
+    });
+  </script>
+</body>
+
+</html>
