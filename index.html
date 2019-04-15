@@ -82,9 +82,24 @@
     });
 
     const { exec } = require('child_process');
+    const path = require('path')
 
     document.getElementById("test").addEventListener("click", function () {
-      exec('cd', (err, stdout, stderr) => {
+      var toolsDir = path.join(__dirname, '/tools');
+      var apktool = path.join(toolsDir, '/apktool_2.3.3.jar');
+      var comm = 'java -jar ' + apktool;
+
+      var myForm = document.getElementById('myForm');
+      var formData = new FormData(myForm);
+
+      if (formData.get("filedir").path == "") {
+        alert("没有选择 APK");
+        return;
+      }
+
+      comm = comm + ' d ' + formData.get("filedir").path;
+
+      exec(comm, (err, stdout, stderr) => {
         if (err) {
           console.log(err);
           return;
