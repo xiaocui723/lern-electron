@@ -60,6 +60,9 @@
     <div>
       <button name="test" id="test">Click</button>
     </div>
+    <div>
+      <textarea id="log"></textarea>
+    </div>
   </div>
 
 
@@ -81,13 +84,12 @@
       }
     });
 
-    const { exec } = require('child_process');
+    const { spawn } = require('child_process');
     const path = require('path')
 
     document.getElementById("test").addEventListener("click", function () {
       var toolsDir = path.join(__dirname, '/tools');
       var apktool = path.join(toolsDir, '/apktool_2.3.3.jar');
-      var comm = 'java -jar ' + apktool;
 
       var myForm = document.getElementById('myForm');
       var formData = new FormData(myForm);
@@ -97,15 +99,24 @@
         return;
       }
 
-      comm = comm + ' d ' + formData.get("filedir").path;
+      var log = document.getElementById('log');
+      var textNode = document.createTextNode('');
+      log.appendChild(textNode);
 
-      exec(comm, (err, stdout, stderr) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
+      var apkt = spawn('java', ['-jar', apktool, 'd', formData.get("filedir").path])
+      apkt.stdout.on('data', function (data) {
+        console.log(`stdout: ${data}`);
+        log.firstChild.appendData(data);
+      });
+
+      apkt.stderr.on('data', function (data) {
+        console.log(`stderr: ${data}`);
+        log.firstChild.appendData(data);
+      });
+
+      apkt.on('close', function (code) {
+        console.log('child process exited with code ' + code);
+        log.firstChild.appendData('child process exited with code ' + code);
       })
     });
   </script>
